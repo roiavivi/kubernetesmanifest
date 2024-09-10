@@ -4,6 +4,9 @@ pipeline {
       yamlFile 'DeploymentPod.yaml'
     }
   }
+  parameters {
+    string(name: 'BUILD_NUMBER', defaultValue: '1', description: 'Build number for the job')
+  }
   stages {
     stage('Update GIT') {
       script {
@@ -12,10 +15,10 @@ pipeline {
             sh "git config user.email 'roie710@gmail.com'"
             sh "git config user.name 'roie710'"
             sh "cat deployment.yaml"
-            sh "sed -i 's+roie710/flask.*+roie710/flask:${DOCKERTAG}+g' deployment.yaml"
+            sh "sed -i 's+roie710/flask.*+roie710/flask:${params.BUILD_NUMBER}+g' deployment.yaml"
             sh "cat deployment.yaml"
             sh "git add ."
-            sh "git commit -m 'Done by Jenkins Job changemanifest: ${env.BUILD_NUMBER}'"
+            sh "git commit -m 'Done by Jenkins Job changemanifest: ${params.BUILD_NUMBER}'"
             sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${GIT_USERNAME}/kubernetesmanifest.git HEAD:main"
           }
         }
